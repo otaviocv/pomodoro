@@ -77,12 +77,12 @@ done
 case ${1} in 
     start)
         echo "$(pomodoro_cycle)" &
-        echo $!>$HOME/.pomodoropid
+        echo $!> "${HOME}/.pomodoropid"
         echo "$(tomato) Pomodoro started!"
         ;;
     stop)
-        kill "$(cat $HOME/.pomodoropid)"
-        rm $HOME/.pomodoropid
+        kill "$(cat "${HOME}/.pomodoropid")"
+        rm "${HOME}/.pomodoropid"
         echo "$(tomato) Pomodoro stoped!"
         ;;
     *)
