@@ -72,6 +72,10 @@ do
 done
 }
 
+help_message() {
+    echo "Help message"
+}
+
 SHORT_CYCLE_LENGHT=5 # in minutes
 NUMBER_OF_SHORT_CYCLES=4 # The nuber of short breaks until a long break
 REST_LENGTH=5 # in minutes
@@ -89,16 +93,48 @@ do
         shift # past argument
         shift # past argument
         ;;
+        -s|--short-cycle-length)
+        SHORT_CYCLE_LENGHT=${2}
+        shift # past argument
+        shift # past argument
+        ;;
+        -r|--rest-length)
+        REST_LENGTH=${2}
+        shift # past argument
+        shift # past argument
+        ;;
+        -f|--file)
+        POMODORO_FILE=${2}
+        shift # past argument
+        shift # past argument
+        ;;
         -l|--loud)
         LOUD=1
+        shift # past argument
+        ;;
+        start|stop)
+        shift
+        ;;
+        -h|--help)
+        echo $(help_message)
+        exit 1
+        shift
         ;;
         *)    # unknown option
-        POSITIONAL+=("$1") # save it in an array for later
+        echo "Unknown option ${key}."
+        echo "$(help_message)"
+        exit 1
         shift # past argument
         ;;
     esac
 done
 set -- "${POSITIONAL[@]}"
+
+# echo SHORT_CYCLE_LENGHT = ${SHORT_CYCLE_LENGHT}
+# echo NUMBER_OF_SHORT_CYCLES = ${NUMBER_OF_SHORT_CYCLES}
+# echo REST_LENGTH = ${REST_LENGTH}
+# echo LOUD = ${LOUD}
+# echo POMODORO_FILE = ${POMODORO_FILE}
 
 case ${1} in 
     start)
@@ -114,5 +150,4 @@ case ${1} in
     *)
         echo "None of the above."
     ;;
-
 esac
