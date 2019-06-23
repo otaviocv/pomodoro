@@ -1,9 +1,5 @@
 #!/bin/bash -e
 
-SHORT_CYCLE_LENGHT=5 # in minutes
-NUMBER_OF_SHORT_BREAKS=4 # The nuber of short breaks until a long break
-LONG_BREAK_DURATION=5 # in minutes
-
 tomato () {
     echo -e "\U1F345"
 }
@@ -30,7 +26,7 @@ long_cycle_message () {
 
 end_of_rest_message () {
     possible_messages=(
-    "Ending of rest period, get back to work."
+    "End of rest period, get back to work."
     "Your rest period just finished, get back here."
     )
     number_of_possible_messages=2
@@ -38,8 +34,10 @@ end_of_rest_message () {
 }
 
 message_notification () {
-    notify-send "$(tomato) ${1}"
-    say "${1}"
+    notify-send "$(tomato) ${1}" --icon=NOTHING
+    if [[ ${LOUD} -eq 1 ]]; then
+        say "${1}"
+    fi
     echo "$(date) [${2}]: \"${1}\""
 }
 
@@ -56,7 +54,7 @@ last_short_cycle () {
 }
 
 rest_cycle () {
-    sleep ${LONG_BREAK_DURATION}
+    sleep ${REST_LENGTH}
     log_message="$(message_notification "$(end_of_rest_message)" "REST")"
     echo ${log_message}
 }
@@ -65,7 +63,7 @@ pomodoro_cycle () {
 notify-send "Starting cycles. You will see a notification like this."
 while true
 do
-    for i in $( seq 1 $((${NUMBER_OF_SHORT_BREAKS}-1)) )
+    for i in $( seq 1 $((${NUMBER_OF_SHORT_CYCLES}-1)) )
     do
         echo "$(short_cycle)"
     done
@@ -74,15 +72,43 @@ do
 done
 }
 
+SHORT_CYCLE_LENGHT=5 # in minutes
+NUMBER_OF_SHORT_CYCLES=4 # The nuber of short breaks until a long break
+REST_LENGTH=5 # in minutes
+LOUD=0
+POMODORO_FILE="${HOME}/.pomodoroid"
+
+# Parsing Arguments
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        -n|--number-of-short-cycles)
+        NUMBER_OF_SHORT_CYCLES=${2}
+        shift # past argument
+        shift # past argument
+        ;;
+        -l|--loud)
+        LOUD=1
+        ;;
+        *)    # unknown option
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+        ;;
+    esac
+done
+set -- "${POSITIONAL[@]}"
+
 case ${1} in 
     start)
         echo "$(pomodoro_cycle)" &
-        echo $!> "${HOME}/.pomodoropid"
+        echo $!> ${POMODORO_FILE}
         echo "$(tomato) Pomodoro started!"
         ;;
     stop)
-        kill "$(cat "${HOME}/.pomodoropid")"
-        rm "${HOME}/.pomodoropid"
+        kill "$(cat ${POMODORO_FILE})"
+        rm ${POMODORO_FILE}
         echo "$(tomato) Pomodoro stoped!"
         ;;
     *)
