@@ -4,6 +4,10 @@ SHORT_CYCLE_LENGHT=5 # in minutes
 NUMBER_OF_SHORT_BREAKS=4 # The nuber of short breaks until a long break
 LONG_BREAK_DURATION=5 # in minutes
 
+tomato () {
+    echo -e "\U1F345"
+}
+
 short_cycle_message () {
     possible_messages=(
     "Short break!"
@@ -34,7 +38,7 @@ end_of_rest_message () {
 }
 
 message_notification () {
-    notify-send "${1}"
+    notify-send "$(tomato) ${1}"
     say "${1}"
     echo "$(date) [${2}]: \"${1}\""
 }
@@ -57,6 +61,7 @@ rest_cycle () {
     echo ${log_message}
 }
 
+pomodoro_cycle () {
 notify-send "Starting cycles. You will see a notification like this."
 while true
 do
@@ -67,3 +72,21 @@ do
     echo "$(last_short_cycle)"
     echo "$(rest_cycle)"
 done
+}
+
+case ${1} in 
+    start)
+        echo "$(pomodoro_cycle)" &
+        echo $!>$HOME/.pomodoropid
+        echo "$(tomato) Pomodoro started!"
+        ;;
+    stop)
+        kill "$(cat $HOME/.pomodoropid)"
+        rm $HOME/.pomodoropid
+        echo "$(tomato) Pomodoro stoped!"
+        ;;
+    *)
+        echo "None of the above."
+    ;;
+
+esac
