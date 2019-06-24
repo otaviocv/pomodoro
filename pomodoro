@@ -4,6 +4,10 @@ tomato () {
     echo -e "\U1F345"
 }
 
+say_function () {
+    echo "${1}" | festival --tts
+}
+
 short_cycle_message () {
     possible_messages=(
     "Short break!"
@@ -36,7 +40,7 @@ end_of_rest_message () {
 message_notification () {
     notify-send "$(tomato) ${1}" --icon=NOTHING
     if [[ ${LOUD} -eq 1 ]]; then
-        say "${1}"
+        $(say_function "${1}")
     fi
     echo "$(date) [${2}]: \"${1}\""
 }
@@ -113,13 +117,14 @@ do
         shift # past argument
         ;;
         start|stop)
+        POSITIONAL+=("$1")
         shift
         ;;
-        -h|--help)
-        echo $(help_message)
-        exit 1
-        shift
-        ;;
+        # -h|--help)
+        # echo $(help_message)
+        # exit 1
+        # shift
+        # ;;
         *)    # unknown option
         echo "Unknown option ${key}."
         echo "$(help_message)"
@@ -130,11 +135,12 @@ do
 done
 set -- "${POSITIONAL[@]}"
 
-# echo SHORT_CYCLE_LENGHT = ${SHORT_CYCLE_LENGHT}
-# echo NUMBER_OF_SHORT_CYCLES = ${NUMBER_OF_SHORT_CYCLES}
-# echo REST_LENGTH = ${REST_LENGTH}
-# echo LOUD = ${LOUD}
-# echo POMODORO_FILE = ${POMODORO_FILE}
+echo SHORT_CYCLE_LENGHT = ${SHORT_CYCLE_LENGHT}
+echo NUMBER_OF_SHORT_CYCLES = ${NUMBER_OF_SHORT_CYCLES}
+echo REST_LENGTH = ${REST_LENGTH}
+echo LOUD = ${LOUD}
+echo POMODORO_FILE = ${POMODORO_FILE}
+echo ${1}
 
 case ${1} in 
     start)
