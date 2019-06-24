@@ -77,7 +77,33 @@ done
 }
 
 help_message() {
-    echo "Help message"
+    # echo "Usage: pomdoro [COMMAND] [OPTION]..."
+    # echo
+    # echo "Start a simple work cycles service."
+
+# List of commands
+#   start           Start the pomodoro service.
+#   stop            Stop the pomdoro service.
+
+# List of options
+#   -n, --number-of-short-cycles
+#                   The number of short cycles, after this number of cycles 
+#                   a short break will happen. Default number of cycles is 4.
+#   -s, --short-cycle-length
+#                   The length of the short cycle, in minutes. Default short
+#                   cycle length is 15 minutes.
+#   -r, --rest-length
+#                   The length of the break after the short cycles, in minutes.
+#                   Default rest length is 5 minutes.
+#   -l, --loud      Enable the text-to-speech system. It will say out loud the
+#                   messages. 
+#   -f, --file      Pomodoro stores the process id in the $HOME/.pomodoroid by
+#                   default, if you want to store it in another file specify
+#                   with this flag.
+#   -h, --help      Show this message.
+#     "
+
+#     echo "${help_text}"
 }
 
 SHORT_CYCLE_LENGHT=5 # in minutes
@@ -107,27 +133,26 @@ do
         shift # past argument
         shift # past argument
         ;;
+        -l|--loud)
+        LOUD=1
+        shift # past argument
+        ;;
         -f|--file)
         POMODORO_FILE=${2}
         shift # past argument
-        shift # past argument
-        ;;
-        -l|--loud)
-        LOUD=1
         shift # past argument
         ;;
         start|stop)
         POSITIONAL+=("$1")
         shift
         ;;
-        # -h|--help)
-        # echo $(help_message)
-        # exit 1
-        # shift
-        # ;;
+        -h|--help)
+        echo $(help_message)
+        exit 1
+        shift
+        ;;
         *)    # unknown option
-        echo "Unknown option ${key}."
-        echo "$(help_message)"
+        echo "Unknown option ${key}. Type pomodoro --help to get more info."
         exit 1
         shift # past argument
         ;;
@@ -135,12 +160,12 @@ do
 done
 set -- "${POSITIONAL[@]}"
 
-echo SHORT_CYCLE_LENGHT = ${SHORT_CYCLE_LENGHT}
-echo NUMBER_OF_SHORT_CYCLES = ${NUMBER_OF_SHORT_CYCLES}
-echo REST_LENGTH = ${REST_LENGTH}
-echo LOUD = ${LOUD}
-echo POMODORO_FILE = ${POMODORO_FILE}
-echo ${1}
+# echo SHORT_CYCLE_LENGHT = ${SHORT_CYCLE_LENGHT}
+# echo NUMBER_OF_SHORT_CYCLES = ${NUMBER_OF_SHORT_CYCLES}
+# echo REST_LENGTH = ${REST_LENGTH}
+# echo LOUD = ${LOUD}
+# echo POMODORO_FILE = ${POMODORO_FILE}
+# echo ${1}
 
 case ${1} in 
     start)
@@ -149,9 +174,13 @@ case ${1} in
         echo "$(tomato) Pomodoro started!"
         ;;
     stop)
-        kill "$(cat ${POMODORO_FILE})"
-        rm ${POMODORO_FILE}
-        echo "$(tomato) Pomodoro stoped!"
+        if [[ -e ${POMODORO_FILE} ]]; then
+            kill "$(cat ${POMODORO_FILE})"
+            rm ${POMODORO_FILE}
+            echo "$(tomato) Pomodoro stoped!"
+        else
+            echo "Pomodoro wasnt't running. Run pomodoro start."
+        fi
         ;;
     *)
         echo "None of the above."
