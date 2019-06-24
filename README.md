@@ -19,7 +19,7 @@ $ export PATH="$PATH:$HOME/.local/bin/"
 You may want to add this last export to your bashrc or bash profile to make it
 available in every sessio.
 
-### Usage
+## Usage
 To start pomodoro simply run
 ``` bash
 $ pomodoro start
@@ -30,7 +30,7 @@ To stop pomdoro
 $ pomodoro stop
 ```
 
-#### Detailed help
+### Detailed help
 ``` bash
 Usage: pomdoro [COMMAND] [OPTION]... 
 Start a simple work cycles service.
